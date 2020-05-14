@@ -66,6 +66,10 @@ a i:hover{
     margin: auto;
     display: block;
 }
+/*cursor*/
+h3 .txt {
+    border-right: 0.08rem solid white;
+}
 .childFlex{
     width: 20%;
     height: auto;

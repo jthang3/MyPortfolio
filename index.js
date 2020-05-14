@@ -1,62 +1,65 @@
-//.....................Html element, word, wait time
-
-var TxtType = function(el, toRotate, period) {
-    this.toRotate = toRotate;
-    this.el = el;
-    this.loopNum = 0;
-    this.period = parseInt(period, 10) || 2000;
-    this.txt = '';
-    this.tick();
+//javaScript type writer
+function typeWriter(txtElement,words,period){
+    this.textElement = txtElement;
+    this.words= words;
+    this.txt = "";
+    this.index = 0;
+    this.wait = parseInt(period,10) || 2000;
+    this.type();
     this.isDeleting = false;
-};
+}
 
-//adding new method of the object
-TxtType.prototype.tick = function() {
-    var i = this.loopNum % this.toRotate.length;
-    var fullTxt = this.toRotate[i];
 
-    if (this.isDeleting) {
-    this.txt = fullTxt.substring(0, this.txt.length - 1);
-    } else {
-    this.txt = fullTxt.substring(0, this.txt.length + 1);
+//type method
+typeWriter.prototype.type = function(){
+    //get full text of current words
+    const current = 0;
+    const fullText = this.words[current];
+    
+//check if it is deleting
+    if(this.isDeleting){
+        //remove our character
+        this.txt = fullText.substring(0,this.txt.length -1);
     }
-
-    this.el.innerHTML = '<strong class="wrap">'+this.txt+'</strong>';
-
-    var that = this;
-    var delta = 200 - Math.random() * 100;
-
-    if (this.isDeleting) { delta /= 2; }
-
-    if (!this.isDeleting && this.txt === fullTxt) {
-    delta = this.period;
-    this.isDeleting = true;
-    } else if (this.isDeleting && this.txt === '') {
-    this.isDeleting = false;
-    this.loopNum++;
-    delta = 500;
+    else{
+        //add character
+        this.txt = fullText.substring(0,this.txt.length + 1);
     }
+    //insert txt into element
+    this.textElement.innerHTML = `<b class = "txt">${this.txt}</b>`
 
-    setTimeout(function() {
-    that.tick();
-    }, delta);
-};
-
-window.onload = function() {
-    var elements = document.getElementsByClassName('typewrite');
-    for (var i=0; i<elements.length; i++) {
-        var toRotate = elements[i].getAttribute('data-type');
-        var period = elements[i].getAttribute('data-period');
-        if (toRotate) {
-          new TxtType(elements[i], JSON.parse(toRotate), period);
-        }
+    //type speed
+    let speed = 200 - Math.random() * 100;
+    if(this.isDeleting){
+        speed /= 2;
     }
-    // INJECT CSS
-    var css = document.createElement("style");
-    css.type = "text/css";
-    css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
-    document.body.appendChild(css);
-};
+    //if word is complete and if deleting
+    if(!this.isDeleting && this.txt == fullText){
+        //pause at the end.
+        speed = this.wait;
+        this.isDeleting = true;
+    }
+    else if(this.isDeleting && this.txt === ""){
+        this.isDeleting = false;
+        this.index++;
+        speed = 500;
+    }
+    setTimeout(()=>{
+        return this.type();
+    }, speed)
+}
+
+//init DOM
+//even when the DOM is fully loaded.
+window.onload = ()=>{
+    const txtElement = document.querySelector(".typewrite");
+    const words = JSON.parse(txtElement.getAttribute("data-type"));
+    const wait = txtElement.getAttribute("data-period");
+    //const myTxt = document.querySelector(".wrap");
+
+    //init an object
+    new typeWriter(txtElement,words,wait);
+}
 
 
 const text = document.querySelector(".fade-in");
